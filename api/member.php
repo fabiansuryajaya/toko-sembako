@@ -84,7 +84,7 @@ switch ($method) {
         }
 
         $id = (int)$_GET['id'];
-        $sql = "UPDATE member SET status = 'N' WHERE id_member=$id";
+        $sql = "DELETE FROM member WHERE id_member=$id";
         if ($conn->query($sql) === TRUE) {
             echo json_encode(['success' => true]);
         } else {

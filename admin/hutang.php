@@ -4,15 +4,21 @@
         <button class="createBtn" id="createProductBtn">Form Hutang Barang</button>
     </div>
 
-    <div class="filter-container">
-        <div class="filter">
-            <label for="from_date">Dari :</label>
+    <div class="filter-container" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:12px;">
+        <div class="filter" style="display:flex;align-items:center;gap:8px;">
+            <label for="from_date" style="margin:0;">Dari</label>
             <input type="date" id="from_date" name="from_date">
-
-            <label for="to_date">Sampai :</label>
+            <label for="to_date" style="margin:0 0 0 8px;">Sampai</label>
             <input type="date" id="to_date" name="to_date">
         </div>
-        <button id="filter_btn">Filter</button>
+
+        <div style="display:flex;align-items:center;gap:12px;">
+            <button id="filter_btn" style="background:#007bff;color:#fff;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;">Filter</button>
+            <label style="display:flex;align-items:center;cursor:pointer;margin:0;">
+                <input type="checkbox" id="toggle_signature" style="margin-right:8px;width:18px;height:18px;">
+                <span>Tampilkan Tanda Tangan</span>
+            </label>
+        </div>
     </div>
 
     <table border="1" cellspacing="0" cellpadding="8">

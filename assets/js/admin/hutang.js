@@ -15,6 +15,9 @@ $(document).ready(function () {
 
     const nomor_hp = '0818-395-768';
 
+    // cache for saved signature image path (from settings.signature_image)
+    let signatureImagePath = '';
+
     const grand_total = document.getElementById('grand_total');
     const grand_total_row = document.getElementById('grand_total_row');
     const total_bayar = document.getElementById('total_bayar');
@@ -108,6 +111,51 @@ $(document).ready(function () {
     fetchMember();
     document.getElementById('filter_btn').addEventListener('click', fetchHutang);
 
+    // Load dan toggle signature setting
+    async function loadSignatureSetting() {
+        try {
+            const result = await callAPI({ url: '../api/settings.php?nama=show_signature_on_nota_hutang', method: 'GET' });
+            if (result.data && result.data.length > 0) {
+                const isEnabled = result.data[0].nilai_setting === 1 || result.data[0].nilai_setting === '1';
+                document.getElementById('toggle_signature').checked = isEnabled;
+            }
+        } catch (error) {
+            console.log('Signature setting tidak ditemukan');
+        }
+    }
+    
+    loadSignatureSetting();
+
+    // Load saved signature image path (if any)
+    async function loadSignatureImageSetting() {
+        try {
+            const result = await callAPI({ url: '../api/settings.php?nama=signature_image', method: 'GET' });
+            if (result.data && result.data.data.length > 0) {
+                const val = result.data.data[0].nilai_setting;
+                if (val) signatureImagePath = val;
+            }
+        } catch (error) {
+            console.log('Signature image setting tidak ditemukan');
+        }
+    }
+
+    loadSignatureImageSetting();
+    
+    document.getElementById('toggle_signature').addEventListener('change', async function() {
+        try {
+            await callAPI({
+                url: '../api/settings.php',
+                method: 'PUT',
+                body: {
+                    nama_setting: 'show_signature_on_nota_hutang',
+                    nilai_setting: this.checked ? 1 : 0
+                }
+            });
+        } catch (error) {
+            console.error('Gagal menyimpan pengaturan signature:', error);
+        }
+    });
+
     document.addEventListener('click', async function(e) {
         if (e.target.classList.contains('strukHutangBtn')) {
             const idPenjualan = e.target.getAttribute('data-id');
@@ -131,6 +179,15 @@ $(document).ready(function () {
                 const total_bayar = totalPembayaranValue !== 0 ? formatCurrencyIDR(totalPembayaranValue) : "";
                 const total_kembalian = totalPembayaranValue !== 0 ? formatCurrencyIDR(totalKembalianValue) : "";
                 const total_tagihan = formatCurrencyIDR(totalTagihanValue);
+
+                // Ambil nilai dari toggle di UI (tidak perlu request API lagi)
+                let showSignature = false;
+                try {
+                    const toggle = document.getElementById('toggle_signature');
+                    if (toggle) showSignature = toggle.checked === true;
+                } catch (e) {
+                    console.log('Gagal membaca toggle_signature');
+                }
 
                 let html = `
                     <div style="text-align:center;font-weight:bold;font-size:15px;letter-spacing:1px;margin-bottom:2mm;">
@@ -209,6 +266,22 @@ $(document).ready(function () {
                         Simpan nota ini sebagai bukti transaksi
                     </div>
                     <hr style="border:0;border-top:2px dashed #333;margin:2mm 0;">
+                    ${showSignature ? (
+                        signatureImagePath ? `
+                    <div style="text-align:center;margin-bottom:3mm;">
+                        <img src="../${signatureImagePath}" alt="Tanda Tangan" style="max-width:100%;height:20mm;object-fit:contain;" />
+                    </div>
+                    <hr style="border:0;border-top:2px dashed #333;margin:2mm 0;">
+                    ` : `
+                    <div style="display:flex;justify-content:space-around;margin-bottom:3mm;font-size:14px;">
+                        <div style="text-align:center;width:40%;">
+                            <div style="height:8mm;border-top:1px solid #333;margin-bottom:2mm;"></div>
+                            <div>Tanda Tangan</div>
+                        </div>
+                    </div>
+                    <hr style="border:0;border-top:2px dashed #333;margin:2mm 0;">
+                    `
+                    ) : ''}
                     <div style="text-align:center;font-size:14px;font-weight:bold;margin-top:2mm;">
                         TERIMA KASIH ATAS PESANANNYA! DITUNGGU ORDER BERIKUTNYA
                     </div>
