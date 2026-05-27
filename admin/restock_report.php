@@ -17,6 +17,7 @@
         </div>
         <!-- export excel -->
         <div style="margin-left: auto;">
+            <button id="delete_btn">Delete</button>
             <button id="export_excel_btn">Export to Excel</button>
             <button id="filter_btn">Filter</button>
         </div>
@@ -26,6 +27,7 @@
         <thead>
             <tr>
                 <th>Tanggal</th>
+                <th>No. Faktur Pajak</th>
                 <th>Nama Produk</th>
                 <th>Satuan Produk</th>
                 <th>Nama Supplier</th>
@@ -126,6 +128,7 @@
                         const displayNum = idx === 0 ? rowNum : '';
                         tr.innerHTML = `
                             <td>${tanggal}</td>
+                            <td>${restock.no_faktur_pajak || restock.id_pembelian || '-'}</td>
                             <td>${restock.nama_product}</td>
                             <td>${restock.nama_satuan}</td>
                             <td>${restock.nama_supplier}</td>
@@ -143,6 +146,19 @@
         }
 
         document.getElementById('filter_btn').addEventListener('click', fetchReport);
+
+        document.getElementById('delete_btn').addEventListener('click', async function() {
+            if (!confirm('Apakah Anda yakin ingin menghapus semua data laporan restock?')) {
+                return;
+            }
+            try {
+                await callAPI({ url: '../api/report_restock.php', body: { method: 'delete' } });
+                fetchReport();
+            } catch (error) {
+                console.error('Gagal menghapus laporan restock:', error);
+                alert('Gagal menghapus laporan restock');
+            }
+        });
 
         // Export to Excel - Format Buku Pembelian
         document.getElementById('export_excel_btn').addEventListener('click', function() {
@@ -177,20 +193,21 @@
             let tableHTML = `
                 <table>
                     <tr>
-                        <td colspan="7" style="text-align: center; font-weight: bold; font-size: 14px;">BUKU PEMBELIAN (CENTER)</td>
+                        <td colspan="8" style="text-align: center; font-weight: bold; font-size: 14px;">BUKU PEMBELIAN (CENTER)</td>
                     </tr>
                     <tr>
-                        <td colspan="7" style="text-align: center; font-weight: bold; font-size: 12px;">MASA PAJAK : ${monthYear} (CENTER)</td>
+                        <td colspan="8" style="text-align: center; font-weight: bold; font-size: 12px;">MASA PAJAK : ${monthYear} (CENTER)</td>
                     </tr>
                     <tr style="height: 10px;"></tr>
                     <tr style="background-color: #CCCCCC; font-weight: bold;">
                         <td style="border: 1px solid black; padding: 5px;">NO</td>
                         <td style="border: 1px solid black; padding: 5px;">TANGGAL FAKTUR PAJAK</td>
                         <td style="border: 1px solid black; padding: 5px;">NO. FAKTUR PAJAK</td>
-                        <td style="border: 1px solid black; padding: 5px;">NAMA BARANG</td>
-                        <td style="border: 1px solid black; padding: 5px;">KUANTITI</td>
-                        <td style="border: 1px solid black; padding: 5px;">HARGA BELI</td>
-                        <td style="border: 1px solid black; padding: 5px;">TOTAL PAJAK</td>
+                        <td style="border: 1px solid black; padding: 5px;">NAMA BARANG/JASA</td>
+                        <td style="border: 1px solid black; padding: 5px;">KG</td>
+                        <td style="border: 1px solid black; padding: 5px;">KW</td>
+                        <td style="border: 1px solid black; padding: 5px;">UNIT PRICE</td>
+                        <td style="border: 1px solid black; padding: 5px;">DASAR PENGENAAN PAJAK (Rp)</td>
                     </tr>
             `;
             
@@ -200,19 +217,23 @@
                 group.items.forEach((item, idx) => {
                     const tanggal = new Date(item.created_at).toLocaleDateString('id-ID');
                     const displayNum = idx === 0 ? rowNum : '';
-                    const noFaktur = idx === 0 ? item.id_pembelian : '';
+                    const noFaktur = idx === 0 ? (item.no_faktur_pajak || item.id_pembelian) : '';
                     const displayTanggal = idx === 0 ? tanggal : '';
-                    
-                    
+                    const berat = parseFloat(item.berat_beras) || 0;
+                    const kuantiti = parseFloat(item.jumlah_pembelian) || 0;
+                    const unitPrice = parseFloat(item.harga_pembelian) || 0;
+                    const dasarPajak = berat * kuantiti * unitPrice;
+
                     tableHTML += `
                         <tr>
                             <td style="border: 1px solid black; padding: 5px; text-align: center;">${displayNum}</td>
                             <td style="border: 1px solid black; padding: 5px;">${displayTanggal}</td>
-                            <td style="border: 1px solid black; padding: 5px;"></td>
+                            <td style="border: 1px solid black; padding: 5px;">${noFaktur}</td>
                             <td style="border: 1px solid black; padding: 5px;">${item.nama_product}</td>
-                            <td style="border: 1px solid black; padding: 5px; text-align: right;">${item.jumlah_pembelian}</td>
-                            <td style="border: 1px solid black; padding: 5px; text-align: right;">Rp. ${parseInt(item.harga_pembelian).toLocaleString('id-ID')}</td>
-                            <td style="border: 1px solid black; padding: 5px; text-align: right;">Rp. ${parseInt(item.total_harga).toLocaleString('id-ID')}</td>
+                            <td style="border: 1px solid black; padding: 5px; text-align: right;">${berat || ''}</td>
+                            <td style="border: 1px solid black; padding: 5px; text-align: right;">${kuantiti}</td>
+                            <td style="border: 1px solid black; padding: 5px; text-align: right;">Rp. ${unitPrice.toLocaleString('id-ID')}</td>
+                            <td style="border: 1px solid black; padding: 5px; text-align: right;">Rp. ${dasarPajak.toLocaleString('id-ID')}</td>
                         </tr>
                     `;
                 });

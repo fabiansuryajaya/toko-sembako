@@ -11,6 +11,16 @@ if (!$data || !isset($data['method'])) {
     exit;
 }
 
+function hasColumn($conn, $table, $column) {
+    $result = $conn->query("SHOW COLUMNS FROM $table LIKE '$column'");
+    return $result && $result->num_rows > 0;
+}
+
+$hasBerat = hasColumn($conn, 'detail_pembelian', 'berat_beras');
+$hasFaktur = hasColumn($conn, 'detail_pembelian', 'faktur_pajak');
+$hasTax = hasColumn($conn, 'detail_pembelian', 'tax');
+$detailFakturColumn = $hasFaktur ? 'faktur_pajak' : ($hasTax ? 'tax' : null);
+
 $method = $data['method'];
 
 switch ($method) {
@@ -18,13 +28,21 @@ switch ($method) {
         $query_data = $data;
         $action = isset($query_data['action']) ? $query_data['action'] : '';
 
+        $extraFields = '';
+        if ($detailFakturColumn) {
+            $extraFields .= ", dp.$detailFakturColumn AS no_faktur_pajak";
+        }
+        if ($hasBerat) {
+            $extraFields .= ', dp.berat_beras';
+        }
+
         // data pembelian detail
-        $sql = "SELECT dp.id_detail_pembelian, dp.id_pembelian, dp.id_produk, p.nama_product, s.nama_satuan, sup.nama_supplier, dp.jumlah_pembelian, dp.harga_pembelian, dp.harga_jual, b.created_at
+        $sql = "SELECT dp.id_detail_pembelian, dp.id_pembelian, dp.id_produk, p.nama_product, s.nama_satuan, sup.nama_supplier, dp.jumlah_pembelian, dp.harga_pembelian, dp.harga_jual, b.created_at $extraFields
                 FROM detail_pembelian dp
                 JOIN pembelian b ON dp.id_pembelian = b.id_pembelian
                 JOIN product p ON dp.id_produk = p.id_product
                 JOIN satuan s ON p.id_satuan = s.id_satuan
-                JOIN supplier sup ON p.id_supplier = sup.id_supplier
+                JOIN supplier sup ON b.id_supplier = sup.id_supplier
                 WHERE dp.status = 'Y'";
 
         if (isset($query_data['product_id']) && !empty($query_data['product_id'])) {
@@ -48,7 +66,7 @@ switch ($method) {
             // Ambil detail berdasarkan ID detail
             if (isset($query_data['id_detail'])) {
                 $id_detail = (int)$query_data['id_detail'];
-                $sql = "SELECT dp.*, p.nama_product, s.nama_satuan, sup.nama_supplier, dp.harga_jual, p.stok_product, dp.tax, b.created_at
+                $sql = "SELECT dp.*, p.nama_product, s.nama_satuan, sup.nama_supplier, dp.harga_jual, p.stok_product$extraFields, b.created_at
                         FROM detail_pembelian dp
                         JOIN pembelian b ON dp.id_pembelian = b.id_pembelian
                         JOIN product p ON dp.id_produk = p.id_product
@@ -84,7 +102,8 @@ switch ($method) {
         $harga_beli = (float)$data['harga_beli'];
         $harga_jual = isset($data['harga_jual']) ? (float)$data['harga_jual'] : 0;
         $restock_quantity = (int)$data['restock_quantity'];
-        $tax = isset($data['tax']) ? (float)$data['tax'] : 0;
+        $no_faktur_pajak = isset($data['no_faktur_pajak']) ? $conn->real_escape_string($data['no_faktur_pajak']) : '';
+        $berat_beras = isset($data['berat_beras']) ? (float)$data['berat_beras'] : 0;
 
         // insert pembelian
         $id_user = 1; // Ganti dengan ID user yang sesuai
@@ -96,8 +115,20 @@ switch ($method) {
         }
         $id_pembelian = $conn->insert_id;
 
+        $detailColumns = 'id_pembelian, id_produk, jumlah_pembelian, harga_pembelian, harga_jual, status, created_at';
+        $detailValues = "$id_pembelian, $product_id, $restock_quantity, $harga_beli, $harga_jual, 'Y', '$tanggal'";
+
+        if ($detailFakturColumn) {
+            $detailColumns .= ", $detailFakturColumn";
+            $detailValues .= ", '$no_faktur_pajak'";
+        }
+        if ($hasBerat) {
+            $detailColumns .= ', berat_beras';
+            $detailValues .= ", $berat_beras";
+        }
+
         // insert detail
-        $sql = "INSERT INTO detail_pembelian (id_pembelian, id_produk, jumlah_pembelian, harga_pembelian, tax, harga_jual, status, created_at) VALUES ($id_pembelian, $product_id, $restock_quantity, $harga_beli, $tax, $harga_jual, 'Y', '$tanggal')";
+        $sql = "INSERT INTO detail_pembelian ($detailColumns) VALUES ($detailValues)";
         if ($conn->query($sql) === FALSE) {
             http_response_code(500);
             echo json_encode(['error' => 'Gagal menambah detail pembelian']);

@@ -65,8 +65,11 @@
                 <label for="total_stock">Jumlah Stock Baru + Sisa Stock Terakhir:</label>
                 <input type="number" id="total_stock" name="total_stock" readonly placeholder="Otomatis">
 
-                <label for="tax">Tax:</label>
-                <input type="number" id="tax" name="tax" min="0" step="0.01" placeholder="0.00">
+                <label for="no_faktur_pajak">No. Faktur Pajak:</label>
+                <input type="text" id="no_faktur_pajak" name="no_faktur_pajak" placeholder="Masukkan No. Faktur Pajak">
+
+                <label for="berat_beras">Berat Beras (KG):</label>
+                <input type="number" id="berat_beras" name="berat_beras" min="0" step="0.01" placeholder="Masukkan berat beras">
             </form>
 
             <div style="position: sticky; bottom: 0; margin-top: 16px; padding-top: 12px; text-align: right; background: #fefefe; border-top: 1px solid #ddd;">
@@ -212,7 +215,8 @@
                                     <p><strong>Sisa Stock Terakhir:</strong> ${detail.stok_product - detail.jumlah_pembelian}</p>
                                     <p><strong>Jumlah Restock:</strong> ${detail.jumlah_pembelian}</p>
                                     <p><strong>Total Stock:</strong> ${detail.stok_product}</p>
-                                    <p><strong>Tax:</strong> ${detail.tax}</p>
+                                    <p><strong>No. Faktur Pajak:</strong> ${detail.no_faktur_pajak || detail.tax || '-'}</p>
+                                    <p><strong>Berat Beras:</strong> ${detail.berat_beras || '-'}</p>
                                 `;
                             })
                             .catch(error => {
@@ -300,7 +304,8 @@
                     harga_beli: document.getElementById('harga_beli').value,
                     harga_jual: document.getElementById('harga_jual').value,
                     restock_quantity: document.getElementById('restock_quantity').value,
-                    tax: document.getElementById('tax').value || 0
+                    no_faktur_pajak: document.getElementById('no_faktur_pajak').value || '',
+                    berat_beras: document.getElementById('berat_beras').value || ''
                 };
 
                 // Validate required fields

@@ -10,6 +10,7 @@
                 <th>ID</th>
                 <th>Nama Pemasok</th>
                 <th>No HP</th>
+                <th>Produk Dijual</th>
                 <th>Aksi</th>
             </tr>
         </thead>
@@ -64,8 +65,10 @@ async function fetchSupplier() {
                 <td>${supplier.id}</td>
                 <td>${supplier.nama}</td>
                 <td>${supplier.no_hp || '-'}</td>
+                <td>${supplier.produk || '-'}</td>
                 <td>
                     <button data-id="${supplier.id}" class="edit-btn">Edit</button>
+                    <button data-id="${supplier.id}" class="delete-btn">Hapus</button>
                 </td>
             `;
             supplierTable.appendChild(tr);
@@ -83,7 +86,20 @@ function addTableEventListeners() {
             await getEditData(id);
         });
     });
-    // Tambahkan event listener untuk tombol hapus jika diperlukan
+
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', async function () {
+            const id = this.getAttribute('data-id');
+            if (!confirm('Apakah Anda yakin ingin menghapus supplier ini?')) return;
+            try {
+                await callAPI({ url: '../api/supplier.php', body: { method: 'delete', id: id } });
+                fetchSupplier();
+            } catch (error) {
+                console.error('Gagal menghapus supplier:', error);
+                alert('Gagal menghapus supplier');
+            }
+        });
+    });
 }
 
 fetchSupplier();

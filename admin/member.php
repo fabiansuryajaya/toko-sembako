@@ -66,6 +66,7 @@ async function fetchMember() {
                 <td>${member.nomor_hp}</td>
                 <td>
                     <button data-id="${member.id}" class="edit-btn">Edit</button>
+                    <button data-id="${member.id}" class="delete-btn">Hapus</button>
                 </td>
             `;
             memberTable.appendChild(tr);
@@ -83,7 +84,20 @@ function addTableEventListeners() {
             await getEditData(id);
         });
     });
-    // Tambahkan event listener untuk tombol hapus jika diperlukan
+
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', async function () {
+            const id = this.getAttribute('data-id');
+            if (!confirm('Apakah Anda yakin ingin menghapus member ini?')) return;
+            try {
+                await callAPI({ url: '../api/member.php', body: { method: 'delete', id: id } });
+                fetchMember();
+            } catch (error) {
+                console.error('Gagal menghapus member:', error);
+                alert('Gagal menghapus member');
+            }
+        });
+    });
 }
 
 fetchMember();
@@ -119,6 +133,7 @@ async function getEditData(id) {
         if (result.data.length > 0) {
             openModal("edit", id);
             document.getElementById('member_name').value = result.data[0].nama;
+            document.getElementById('nomor_hp').value = result.data[0].nomor_hp || '';
         } else {
             console.error('Member tidak ditemukan');
         }

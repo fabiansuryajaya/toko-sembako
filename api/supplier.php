@@ -18,13 +18,18 @@ switch ($method) {
     case 'read':
         $query_data = $data;
 
-        // Ambil semua supplier
-        $sql = "SELECT id_supplier as id, nama_supplier as nama, nomor_hp as no_hp FROM supplier WHERE status = 'Y'";
+        // Ambil semua supplier beserta produk yang dijual
+        $sql = "SELECT su.id_supplier as id, su.nama_supplier as nama, su.nomor_hp as no_hp, 
+                COALESCE(GROUP_CONCAT(DISTINCT pr.nama_product ORDER BY pr.nama_product SEPARATOR ', '), '-') as produk
+                FROM supplier su
+                LEFT JOIN product pr ON su.id_supplier = pr.id_supplier
+                WHERE su.status = 'Y'";
         if (isset($query_data['id'])) {
-            // Jika ada ID, ambil supplier berdasarkan ID
             $id = (int)$query_data['id'];
-            $sql .= " AND id_supplier = $id";
+            $sql .= " AND su.id_supplier = $id";
         }
+        $sql .= ' GROUP BY su.id_supplier';
+
         $result = $conn->query($sql);
 
         $suppliers = [];
@@ -69,7 +74,7 @@ switch ($method) {
         $nama = $conn->real_escape_string($data['nama']);
         $no_hp = $conn->real_escape_string($data['no_hp']);
 
-        $sql = "UPDATE supplier SET nama_supplier='$nama',nomor_hp='$data[no_hp]' WHERE id_supplier=$id";
+        $sql = "UPDATE supplier SET nama_supplier='$nama', nomor_hp='$no_hp' WHERE id_supplier=$id";
         if ($conn->query($sql) === TRUE) {
             echo json_encode(['success' => true]);
         } else {

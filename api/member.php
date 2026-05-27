@@ -6,6 +6,13 @@ header('Content-Type: application/json');
 
 $data = json_decode(file_get_contents('php://input'), true);
 
+function hasColumn($conn, $table, $column) {
+    $result = $conn->query("SHOW COLUMNS FROM $table LIKE '$column'");
+    return $result && $result->num_rows > 0;
+}
+
+$hasStatus = hasColumn($conn, 'member', 'status');
+
 if (!$data || !isset($data['method'])) {
     http_response_code(400);
     echo json_encode(['error' => 'Method tidak disertakan']);
@@ -20,10 +27,16 @@ switch ($method) {
 
         // Ambil semua member
         $sql = "SELECT id_member as id, nama as nama, nomor_hp as nomor_hp FROM member";
+        if ($hasStatus) {
+            $sql .= " WHERE status = 'Y'";
+        }
         if (isset($query_data['id'])) {
-            // Jika ada ID, ambil member berdasarkan ID
             $id = (int)$query_data['id'];
-            $sql .= " WHERE id_member = $id";
+            if ($hasStatus) {
+                $sql .= " AND id_member = $id";
+            } else {
+                $sql .= " WHERE id_member = $id";
+            }
         }
         $result = $conn->query($sql);
 
@@ -86,7 +99,11 @@ switch ($method) {
         }
 
         $id = (int)$data['id'];
-        $sql = "UPDATE member SET status = 'N' WHERE id_member=$id";
+        if ($hasStatus) {
+            $sql = "UPDATE member SET status = 'N' WHERE id_member=$id";
+        } else {
+            $sql = "DELETE FROM member WHERE id_member=$id";
+        }
         if ($conn->query($sql) === TRUE) {
             echo json_encode(['success' => true]);
         } else {

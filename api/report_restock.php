@@ -5,6 +5,16 @@ header('Content-Type: application/json');
 
 $data = json_decode(file_get_contents('php://input'), true);
 
+function hasColumn($conn, $table, $column) {
+    $result = $conn->query("SHOW COLUMNS FROM $table LIKE '$column'");
+    return $result && $result->num_rows > 0;
+}
+
+$hasBerat = hasColumn($conn, 'detail_pembelian', 'berat_beras');
+$hasFaktur = hasColumn($conn, 'detail_pembelian', 'faktur_pajak');
+$hasTax = hasColumn($conn, 'detail_pembelian', 'tax');
+$detailFakturColumn = $hasFaktur ? 'faktur_pajak' : ($hasTax ? 'tax' : null);
+
 if (!$data || !isset($data['method'])) {
     http_response_code(400);
     echo json_encode(['error' => 'Method tidak disertakan']);
@@ -21,9 +31,17 @@ switch ($method) {
         $from_date  = isset($data['from_date'])  ? $conn->real_escape_string($data['from_date']) : ''; // YYYY-MM-DD
         $to_date    = isset($data['to_date'])    ? $conn->real_escape_string($data['to_date'])   : ''; // YYYY-MM-DD
         
+        $extraFields = '';
+        if ($detailFakturColumn) {
+            $extraFields .= ", dp.$detailFakturColumn as no_faktur_pajak";
+        }
+        if ($hasBerat) {
+            $extraFields .= ', dp.berat_beras';
+        }
+
         // data restock - detail per pembelian
         $sql = "SELECT p.id_pembelian, p.created_at, pr.nama_product, dp.jumlah_pembelian, dp.harga_pembelian, 
-                (dp.harga_pembelian * dp.jumlah_pembelian) as total_harga, s.nama_satuan, su.nama_supplier
+                (dp.harga_pembelian * dp.jumlah_pembelian) as total_harga, s.nama_satuan, su.nama_supplier $extraFields
                 FROM pembelian p 
                 JOIN detail_pembelian dp ON p.id_pembelian = dp.id_pembelian
                 JOIN product pr ON dp.id_produk = pr.id_product
