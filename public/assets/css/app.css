@@ -1,0 +1,174 @@
+/* Toko Sembako — satu stylesheet untuk seluruh aplikasi. */
+
+:root {
+  --bg: #f4f6f8;
+  --surface: #ffffff;
+  --text: #1f2933;
+  --muted: #6b7680;
+  --border: #d9dee3;
+  --primary: #1f6feb;
+  --primary-dark: #1858bd;
+  --success: #1a7f37;
+  --warning: #b35900;
+  --danger: #c62828;
+  --sidebar: #1e293b;
+  --sidebar-text: #cbd5e1;
+  --radius: 6px;
+  --shadow: 0 1px 3px rgba(0, 0, 0, .08);
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  font-size: 15px;
+  color: var(--text);
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); }
+h1 { font-size: 1.45rem; margin: 0; }
+h2 { font-size: 1.15rem; margin: 0 0 .75rem; }
+a { color: var(--primary); }
+code { background: #eef1f4; padding: 0 .3em; border-radius: 3px; }
+[hidden] { display: none !important; }
+.muted { color: var(--muted); }
+.text-danger { color: var(--danger); }
+.num { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.pre { white-space: pre-wrap; }
+
+/* ---------- layout ---------- */
+.layout { display: flex; min-height: 100vh; }
+.sidebar { width: 220px; flex-shrink: 0; background: var(--sidebar); color: var(--sidebar-text); padding: 1rem 0; }
+.sidebar-head { padding: 0 1.1rem 1rem; display: flex; flex-direction: column; gap: .15rem; border-bottom: 1px solid #334155; margin-bottom: .5rem; }
+.sidebar-head strong { color: #fff; font-size: 1.1rem; }
+.sidebar-head .muted { color: #94a3b8; font-size: .85rem; }
+.menu, .menu ul { list-style: none; margin: 0; padding: 0; }
+.menu a { display: block; padding: .5rem 1.1rem; color: var(--sidebar-text); text-decoration: none; }
+.menu a:hover { background: #273449; color: #fff; }
+.menu a.active { background: var(--primary); color: #fff; }
+.menu-group-label { display: block; padding: .75rem 1.1rem .25rem; font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; color: #94a3b8; }
+.menu-group a { padding-left: 1.6rem; }
+.screen { flex: 1; min-width: 0; padding: 1.25rem 1.5rem 3rem; }
+
+/* ---------- halaman ---------- */
+.page { display: flex; flex-direction: column; gap: 1rem; }
+.page-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+.toolbar { display: flex; align-items: flex-end; gap: .75rem; flex-wrap: wrap; background: var(--surface); padding: .75rem; border-radius: var(--radius); box-shadow: var(--shadow); }
+.toolbar label { display: flex; flex-direction: column; gap: .2rem; font-size: .85rem; color: var(--muted); }
+.toolbar label.check { flex-direction: row; align-items: center; color: var(--text); font-size: .95rem; }
+.toolbar .grow { flex: 1; min-width: 220px; }
+.spacer { flex: 1; }
+.summary { display: flex; gap: 1.5rem; flex-wrap: wrap; font-weight: 600; }
+.summary:empty { display: none; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem; align-items: start; }
+.card { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 1.1rem; }
+.form-narrow { max-width: 420px; }
+.alert { padding: .75rem 1rem; border-radius: var(--radius); margin-bottom: 1rem; }
+.alert-warning { background: #fff4e5; border: 1px solid #ffd8a8; color: #7a4100; }
+
+/* ---------- tabel ---------- */
+.table-wrap { overflow-x: auto; background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); }
+.table { width: 100%; border-collapse: collapse; }
+.table th, .table td { padding: .55rem .7rem; border-bottom: 1px solid var(--border); text-align: left; vertical-align: middle; }
+.table thead th { background: #f0f3f6; font-size: .85rem; text-transform: uppercase; letter-spacing: .03em; color: #4a5560; position: sticky; top: 0; }
+.table tbody tr:hover { background: #f8fafc; }
+.table tfoot th, .table tfoot td { background: #f8fafc; font-weight: 600; }
+.table .num { text-align: right; }
+.table tr.empty td { text-align: center; color: var(--muted); padding: 1.5rem; }
+.table .actions { white-space: nowrap; }
+.table .actions .btn + .btn { margin-left: .3rem; }
+.row-muted td { color: var(--muted); }
+.table-cart input { width: 110px; }
+.input-inline { width: 110px; }
+.input-inline.changed { background: #fff8db; border-color: #e0b100; }
+
+/* ---------- tombol ---------- */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: .35rem; padding: .5rem .9rem; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--text); font: inherit; cursor: pointer; text-decoration: none; line-height: 1.2; }
+.btn:hover { background: #f0f3f6; }
+.btn:disabled { opacity: .55; cursor: not-allowed; }
+.btn-sm { padding: .3rem .6rem; font-size: .85rem; }
+.btn-block { width: 100%; }
+.btn-primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-success { background: var(--success); border-color: var(--success); color: #fff; }
+.btn-warning { background: var(--warning); border-color: var(--warning); color: #fff; }
+.btn-danger { background: var(--danger); border-color: var(--danger); color: #fff; }
+.btn-success:hover, .btn-warning:hover, .btn-danger:hover { filter: brightness(.92); }
+.btn.active { outline: 2px solid var(--warning); }
+.btn-icon { border: 0; background: none; color: var(--danger); cursor: pointer; font-size: 1rem; padding: .2rem .4rem; }
+
+/* ---------- form ---------- */
+input, select, textarea { font: inherit; padding: .45rem .55rem; border: 1px solid var(--border); border-radius: var(--radius); background: #fff; color: var(--text); }
+input:focus, select:focus, textarea:focus { outline: 2px solid #9ec5fe; border-color: var(--primary); }
+input:disabled { background: #f0f3f6; }
+.form { display: flex; flex-direction: column; gap: .8rem; }
+.form > label, .grid-2 > label { display: flex; flex-direction: column; gap: .25rem; font-weight: 500; }
+.form label.check, .check { flex-direction: row !important; align-items: center; gap: .5rem; font-weight: 400; cursor: pointer; }
+.check-inline { align-self: end; padding-bottom: .5rem; }
+.grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .8rem; }
+.add-row { display: flex; gap: .5rem; align-items: flex-end; flex-wrap: wrap; }
+.add-row label { display: flex; flex-direction: column; gap: .25rem; font-weight: 500; }
+.add-row .grow { flex: 1; min-width: 240px; }
+.totals { display: flex; flex-direction: column; align-items: flex-end; gap: .4rem; }
+.totals label { display: flex; align-items: center; gap: .75rem; font-weight: 500; }
+.totals input, .totals output { width: 160px; text-align: right; }
+.totals output { font-weight: 700; padding: .45rem .55rem; background: #f0f3f6; border-radius: var(--radius); }
+.form-actions { display: flex; justify-content: flex-end; gap: .5rem; margin-top: .25rem; }
+.form-feedback { color: var(--danger); min-height: 1.2em; margin: 0; }
+.detail-list { display: grid; grid-template-columns: 130px 1fr; gap: .4rem .75rem; margin: 0 0 1rem; }
+.detail-list dt { font-weight: 600; }
+.detail-list dd { margin: 0; }
+.signature-box { width: 200px; height: 90px; border: 1px dashed var(--border); display: flex; align-items: center; justify-content: center; margin-bottom: .75rem; background: #fff; }
+.signature-box img { max-width: 100%; max-height: 100%; }
+.select2-container .select2-selection--single { height: 36px; border-color: var(--border); }
+.select2-container .select2-selection--single .select2-selection__rendered { line-height: 34px; }
+.select2-container .select2-selection--single .select2-selection__arrow { height: 34px; }
+.select2-container--default .select2-selection--multiple { border-color: var(--border); min-height: 36px; }
+
+/* ---------- badge & toast ---------- */
+.badge { display: inline-block; padding: .1rem .5rem; border-radius: 999px; font-size: .8rem; background: #e7ecf0; color: #3b4650; }
+.badge-ok { background: #dcf5e3; color: var(--success); }
+.badge-warn { background: #fff1d6; color: var(--warning); }
+.badge-off { background: #f3e1e1; color: var(--danger); }
+#toasts { position: fixed; right: 1rem; bottom: 1rem; display: flex; flex-direction: column; gap: .5rem; z-index: 2000; }
+.toast { padding: .7rem 1rem; border-radius: var(--radius); color: #fff; box-shadow: 0 4px 12px rgba(0, 0, 0, .2); max-width: 380px; }
+.toast-success { background: var(--success); }
+.toast-error { background: var(--danger); }
+
+/* ---------- modal ---------- */
+.modal { position: fixed; inset: 0; background: rgba(15, 23, 42, .45); display: flex; align-items: flex-start; justify-content: center; padding: 4vh 1rem; z-index: 1000; overflow-y: auto; }
+.modal-content { background: var(--surface); border-radius: 8px; padding: 1.25rem; width: 100%; max-width: 680px; box-shadow: 0 10px 30px rgba(0, 0, 0, .25); }
+.modal-sm { max-width: 440px; }
+.modal-lg { max-width: 960px; }
+.modal-receipt-content { max-width: calc(80mm + 2.5rem); }
+.select2-container--open { z-index: 1100; }
+
+/* ---------- struk (pratinjau di layar) ---------- */
+.receipt { width: 80mm; max-width: 100%; margin: 0 auto 1rem; font-family: Calibri, Arial, sans-serif; font-size: 13px; }
+.receipt .r-title { text-align: center; font-weight: bold; font-size: 15px; letter-spacing: 1px; }
+.receipt .r-center { text-align: center; }
+.receipt .r-small { font-size: 12px; margin-top: 4px; }
+.receipt hr { border: 0; border-top: 1px dashed #333; margin: 6px 0; }
+.receipt hr.thick { border-top-width: 2px; }
+.receipt table { width: 100%; border-collapse: collapse; }
+.receipt td { padding: 1px 0; }
+.receipt .r-totals td { font-weight: bold; }
+.receipt .r-signature { max-width: 100%; height: 20mm; object-fit: contain; }
+.receipt .r-sign-line { width: 45%; margin: 28px auto 6px; border-top: 1px solid #333; text-align: center; }
+
+/* ---------- login ---------- */
+.login-body { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 1rem; }
+.login-card { background: var(--surface); padding: 2rem; border-radius: 10px; box-shadow: 0 6px 24px rgba(0, 0, 0, .1); width: 100%; max-width: 360px; }
+.login-card h1 { margin-bottom: .2rem; }
+.login-card form { display: flex; flex-direction: column; gap: .4rem; margin-top: 1.25rem; }
+.login-card button { margin-top: .8rem; }
+
+/* ---------- layar kecil ---------- */
+@media (max-width: 800px) {
+  .layout { flex-direction: column; }
+  .sidebar { width: 100%; padding: .5rem 0; }
+  .sidebar-head { flex-direction: row; justify-content: space-between; align-items: baseline; padding-bottom: .5rem; }
+  .menu { display: flex; flex-wrap: wrap; }
+  .menu > li > a, .menu-group a { padding: .4rem .8rem; }
+  .menu-group { display: contents; }
+  .menu-group-label { display: none; }
+  .menu-group ul { display: contents; }
+  .screen { padding: 1rem; }
+  .grid-2 { grid-template-columns: 1fr; }
+}

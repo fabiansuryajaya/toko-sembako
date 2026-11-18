@@ -1,0 +1,9 @@
+# Lapisan pertama: hanya folder public/ yang boleh dibuka dari browser.
+Options -Indexes
+DirectoryIndex index.php
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^(src|config|database|tests|storage)(/|$) - [F,L]
+    RewriteRule (^|/)\.(git|env) - [F,L]
+</IfModule>

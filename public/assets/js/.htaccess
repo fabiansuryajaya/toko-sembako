@@ -1,0 +1,4 @@
+# Browser selalu memeriksa versi terbaru modul JS (penting setelah update aplikasi).
+<IfModule mod_headers.c>
+    Header set Cache-Control "no-cache"
+</IfModule>

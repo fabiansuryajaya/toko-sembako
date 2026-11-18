@@ -1,0 +1,9 @@
+# Hanya gambar yang boleh disajikan dari folder upload; skrip apa pun ditolak.
+Options -Indexes -ExecCGI
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+RemoveHandler .php .phtml .phar .php5 .php7 .php8
+<FilesMatch "\.(?i:php\d?|phtml|phar|cgi|pl|py|sh|html?|svg)$">
+    Require all denied
+</FilesMatch>
