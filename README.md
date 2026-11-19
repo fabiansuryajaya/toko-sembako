@@ -105,3 +105,8 @@ Versi ini memakai skema database baru, jadi data versi lama tidak terbaca langsu
   - Identitas toko yang dulu ditulis di kode sekarang ada di Pengaturan.
   - Format respons API dulu berbeda-beda, sekarang seragam.
   - File `select2.min.css` yang dulu kosong sudah diganti.
+
+## Hak cipta
+
+© 2026 Fabian Suryajaya. Hak cipta dilindungi.
+Kode ini ditampilkan sebagai portofolio. Tidak untuk dipakai, diubah, atau dijual ulang tanpa izin tertulis — hubungi lewat [rakitkode.com](https://rakitkode.com).
